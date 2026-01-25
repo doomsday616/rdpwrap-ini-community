@@ -83,12 +83,12 @@ Search for these critical functions that RDP Wrapper needs to patch:
 1. Search for relevant strings:
    - "Terminal Services"
    - "Session"
-   - "License"
+   - "Licence"
    - "Policy"
    - Error messages related to licensing
 
 2. Follow cross-references from strings to functions
-3. Analyze the functions that reference these strings
+3. Analyse the functions that reference these strings
 ```
 
 ### Method 2: Import Table Analysis
@@ -98,7 +98,7 @@ Search for these critical functions that RDP Wrapper needs to patch:
    - GetTokenInformation
    - WinStationQueryInformationW
    - RegQueryValueExW
-   - License-related APIs
+   - Licence-related APIs
 
 2. Find functions that call these imports
 3. Trace backwards to find policy validation logic
@@ -118,7 +118,7 @@ B8 01 00 00 00    ; mov eax, 1
 
 #### DefPolicy Patch Pattern
 ```asm
-; Look for license policy validation:
+; Look for licence policy validation:
 B8 01 00 00 00       ; mov eax, 1 (policy result)
 89 81 38 06 00 00    ; mov [rcx+638h], eax (store result)
 ; Or similar patterns with different registers
@@ -136,8 +136,8 @@ B8 01 00 00 00       ; mov eax, 1 (policy result)
 ### DefPolicy Offset
 
 1. Find `CDefPolicy::Query`
-2. Look for license validation logic
-3. Find where it sets the result to indicate "licensed"
+2. Look for licence validation logic
+3. Find where it sets the result to indicate "licenced"
 4. Note the offset for the instruction to patch
 
 ### LocalOnly Offset
@@ -150,7 +150,7 @@ B8 01 00 00 00       ; mov eax, 1 (policy result)
 ### SLInit Parameters
 
 1. Find `CSLQuery::Initialize`
-2. Analyze the data structure it initializes
+2. Analyse the data structure it initializes
 3. Find the memory offsets for these fields:
    - `bInitialized`
    - `bServerSku`
@@ -172,7 +172,7 @@ SingleUserPatch.x64=1
 SingleUserOffset.x64=OFFSET_HEX
 SingleUserCode.x64=PATCH_CODE
 
-; License policy patch
+; Licence policy patch
 DefPolicyPatch.x64=1
 DefPolicyOffset.x64=OFFSET_HEX
 DefPolicyCode.x64=PATCH_CODE
@@ -224,7 +224,7 @@ CDefPolicy_Query_eax_rcx_jmp=B80001000089813806000090EB  ; Policy bypass
 1. Use x64dbg to attach to the running termsrv.exe process
 2. Set breakpoints at your calculated offsets
 3. Verify that your patches are being applied correctly
-4. Monitor for any crashes or unexpected behavior
+3. Monitor for any crashes or unexpected behaviour
 
 ### Validation Steps
 
@@ -269,9 +269,9 @@ Create a detailed report including:
 
 Modern Windows uses ASLR, but the relative offsets within the DLL remain constant. Always work with file offsets, not memory addresses.
 
-### Compiler Optimizations
+### Compiler Optimisations
 
-Microsoft's compiler optimizations can:
+Microsoft's compiler optimisations can:
 - Inline functions
 - Reorder code
 - Change calling conventions
@@ -295,7 +295,7 @@ The same logical function might be implemented differently across builds:
 
 ### Comparative Analysis
 
-When analyzing a new build:
+When analysing a new build:
 1. Compare with a known working build
 2. Look for similar patterns and structures
 3. Use diff tools on disassembled code
@@ -312,7 +312,7 @@ Some community members have created scripts to:
 Tools like BinDiff can help identify:
 - Changed functions between builds
 - Similar code blocks
-- Function renaming/reorganization
+- Function renaming/reorganisation
 
 ## Community Resources
 
