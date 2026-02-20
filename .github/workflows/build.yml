@@ -55,7 +55,7 @@ jobs:
         shell: cmd
         run: |
           mkdir bin 2>nul
-          fpc -Moobjfpc -Sh -O3 -XX -CX -Twin64 -FEbin src-installer\RDPWInst.lpr
+          fpc -Mobjfpc -Sh -O3 -XX -CX -Twin64 -FEbin src-installer\RDPWInst.lpr
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
