@@ -24,7 +24,93 @@ program RDPWInst;
 {$APPTYPE CONSOLE}
 
 uses
-  SysUtils, Classes, Windows, Registry, WinSvc;
+  SysUtils, Classes, Windows, Registry;
+
+{ ---------- WinSvc declarations (FPC lacks a WinSvc unit) ---------- }
+
+const
+  SERVICES_ACTIVE_DATABASE = 'ServicesActive';
+  SC_MANAGER_CONNECT = $0001;
+  SC_MANAGER_ENUMERATE_SERVICE = $0004;
+  SC_MANAGER_ALL_ACCESS = $F003F;
+  SERVICE_QUERY_CONFIG = $0001;
+  SERVICE_CHANGE_CONFIG = $0002;
+  SERVICE_START = $0010;
+  SERVICE_STOP = $0020;
+  SERVICE_ALL_ACCESS = $F01FF;
+  SERVICE_NO_CHANGE = $FFFFFFFF;
+  SERVICE_AUTO_START = $00000002;
+  SERVICE_DEMAND_START = $00000003;
+  SERVICE_DISABLED = $00000004;
+  SERVICE_WIN32 = $00000030;
+  SERVICE_STATE_ALL = $00000003;
+  SERVICE_RUNNING = $00000004;
+  SERVICE_STOPPED = $00000001;
+  SERVICE_CONTROL_STOP = $00000001;
+  ERROR_SERVICE_DOES_NOT_EXIST = 1060;
+  ERROR_SERVICE_NOT_ACTIVE = 1062;
+
+type
+  SC_HANDLE = THandle;
+
+  TQueryServiceConfig = packed record
+    dwServiceType: DWORD;
+    dwStartType: DWORD;
+    dwErrorControl: DWORD;
+    lpBinaryPathName: PWideChar;
+    lpLoadOrderGroup: PWideChar;
+    dwTagId: DWORD;
+    lpDependencies: PWideChar;
+    lpServiceStartName: PWideChar;
+    lpDisplayName: PWideChar;
+  end;
+  PQueryServiceConfig = ^TQueryServiceConfig;
+
+  SERVICE_STATUS = packed record
+    dwServiceType: DWORD;
+    dwCurrentState: DWORD;
+    dwControlsAccepted: DWORD;
+    dwWin32ExitCode: DWORD;
+    dwServiceSpecificExitCode: DWORD;
+    dwCheckPoint: DWORD;
+    dwWaitHint: DWORD;
+  end;
+  LPSERVICE_STATUS = ^SERVICE_STATUS;
+
+function OpenSCManagerW(lpMachineName, lpDatabaseName: PWideChar;
+  dwDesiredAccess: DWORD): THandle; stdcall; external advapi32 name 'OpenSCManagerW';
+function OpenServiceW(hSCManager: THandle; lpServiceName: PWideChar;
+  dwDesiredAccess: DWORD): THandle; stdcall; external advapi32 name 'OpenServiceW';
+function CloseServiceHandle(hSCObject: THandle): BOOL; stdcall;
+  external advapi32 name 'CloseServiceHandle';
+function StartServiceW(hService: THandle; dwNumServiceArgs: DWORD;
+  lpServiceArgVectors: PWideChar): BOOL; stdcall; external advapi32 name 'StartServiceW';
+function ControlService(hService: THandle; dwControl: DWORD;
+  var lpServiceStatus: SERVICE_STATUS): BOOL; stdcall; external advapi32 name 'ControlService';
+function QueryServiceConfigW(hService: THandle; lpServiceConfig: Pointer;
+  cbBufSize: DWORD; pcbBytesNeeded: PDWORD): BOOL; stdcall; external advapi32 name 'QueryServiceConfigW';
+function ChangeServiceConfigW(hService: THandle;
+  dwServiceType, dwStartType, dwErrorControl: DWORD;
+  lpBinaryPathName, lpLoadOrderGroup: PWideChar;
+  lpdwTagId: PDWORD;
+  lpDependencies, lpServiceStartName, lpPassword, lpDisplayName: PWideChar): BOOL; stdcall;
+  external advapi32 name 'ChangeServiceConfigW';
+
+{ Aliases to match code that uses non-W names }
+function OpenSCManager(lpMachineName, lpDatabaseName: PWideChar;
+  dwDesiredAccess: DWORD): THandle; stdcall; external advapi32 name 'OpenSCManagerW';
+function OpenService(hSCManager: THandle; lpServiceName: PWideChar;
+  dwDesiredAccess: DWORD): THandle; stdcall; external advapi32 name 'OpenServiceW';
+function StartService(hService: THandle; dwNumServiceArgs: DWORD;
+  lpServiceArgVectors: PWideChar): BOOL; stdcall; external advapi32 name 'StartServiceW';
+function QueryServiceConfig(hService: THandle; lpServiceConfig: Pointer;
+  cbBufSize: DWORD; pcbBytesNeeded: PDWORD): BOOL; stdcall; external advapi32 name 'QueryServiceConfigW';
+function ChangeServiceConfig(hService: THandle;
+  dwServiceType, dwStartType, dwErrorControl: DWORD;
+  lpBinaryPathName, lpLoadOrderGroup: PWideChar;
+  lpdwTagId: PDWORD;
+  lpDependencies, lpServiceStartName, lpPassword, lpDisplayName: PWideChar): BOOL; stdcall;
+  external advapi32 name 'ChangeServiceConfigW';
 
 { ---------- External API declarations ---------- }
 
