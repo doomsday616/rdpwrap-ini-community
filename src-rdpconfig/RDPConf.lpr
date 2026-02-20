@@ -1,4 +1,5 @@
 {
+  RDP Wrapper Library - Configuration Tool
   Copyright 2014 Stas'M Corp.
   Copyright 2024-2026 RDP Wrapper Community Edition contributors
 
@@ -17,33 +18,27 @@
   Ported from Delphi VCL to Lazarus LCL for community CI builds.
 }
 
-unit LicenseUnit;
+program RDPConf;
 
 {$mode objfpc}{$H+}
 
-interface
-
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls;
+  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  cthreads,
+  {$ENDIF}{$ENDIF}
+  Interfaces, // this includes the LCL widgetset
+  Forms,
+  MainUnit,
+  LicenseUnit;
 
-type
+{$R *.res}
 
-  { TLicenseForm }
-  TLicenseForm = class(TForm)
-    mText: TMemo;
-    bAccept: TButton;
-    bDecline: TButton;
-  private
-
-  public
-
-  end;
-
-var
-  LicenseForm: TLicenseForm;
-
-implementation
-
-{$R *.lfm}
-
+begin
+  RequireDerivedFormResource := True;
+  Application.Scaled := True;
+  Application.Initialize;
+  Application.Title := 'Remote Desktop Protocol Configuration';
+  Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TLicenseForm, LicenseForm);
+  Application.Run;
 end.

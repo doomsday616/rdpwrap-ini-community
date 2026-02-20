@@ -1,0 +1,169 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: Build rdpwrap.dll (C++ MSVC, x86+x64)
+  # ─────────────────────────────────────────────
+  build-dll:
+    name: Build rdpwrap.dll (${{ matrix.platform }})
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [Win32, x64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build rdpwrap.dll
+        run: |
+          msbuild src-x86-x64-Fusix\RDPWrap.sln /p:Configuration=Release /p:Platform=${{ matrix.platform }}
+
+      - name: Upload DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdpwrap-dll-${{ matrix.platform }}
+          path: src-x86-x64-Fusix/**/Release/RDPWrap.dll
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────
+  # Job 2: Build RDPWInst.exe (Free Pascal)
+  # ─────────────────────────────────────────────
+  build-installer:
+    name: Build RDPWInst.exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Lazarus (includes FPC)
+        uses: gcarreno/setup-lazarus@v3
+        with:
+          lazarus-version: stable
+
+      - name: Compile RDPWInst.exe
+        shell: cmd
+        run: |
+          mkdir bin 2>nul
+          fpc -Moobjfpc -Sh -O3 -XX -CX -WG -Twin32 -FEbin src-installer\RDPWInst.lpr
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdpwinst-exe
+          path: bin/RDPWInst.exe
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────
+  # Job 3: Build RDPConf.exe (Lazarus/LCL)
+  # ─────────────────────────────────────────────
+  build-config:
+    name: Build RDPConf.exe
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Lazarus
+        uses: gcarreno/setup-lazarus@v3
+        with:
+          lazarus-version: stable
+
+      - name: Compile RDPConf.exe
+        shell: cmd
+        run: |
+          mkdir bin 2>nul
+          lazbuild --build-mode=Release src-rdpconfig\RDPConf.lpi
+
+      - name: Upload config tool artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdpconf-exe
+          path: bin/RDPConf.exe
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────
+  # Job 4: Download upstream RDPCheck.exe
+  # ─────────────────────────────────────────────
+  fetch-rdpcheck:
+    name: Fetch RDPCheck.exe (upstream v1.6.2)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download upstream release
+        run: |
+          mkdir -p upstream
+          curl -L -o upstream/RDPWrap-v1.6.2.zip \
+            "https://github.com/stascorp/rdpwrap/releases/download/v1.6.2/RDPWrap-v1.6.2.zip"
+          cd upstream && unzip RDPWrap-v1.6.2.zip RDPCheck.exe
+
+      - name: Upload RDPCheck artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdpcheck-exe
+          path: upstream/RDPCheck.exe
+          if-no-files-found: error
+
+  # ─────────────────────────────────────────────
+  # Job 5: Package release
+  # ─────────────────────────────────────────────
+  package:
+    name: Package Release
+    needs: [build-dll, build-installer, build-config, fetch-rdpcheck]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Assemble release package
+        run: |
+          mkdir -p release
+
+          # rdpwrap.dll — community installer copies from same dir,
+          # so we ship both as rdpwrap32.dll and rdpwrap64.dll.
+          # The installer knows to pick the right one based on arch.
+          find artifacts/rdpwrap-dll-Win32 -name 'RDPWrap.dll' | head -1 | xargs -I{} cp {} release/rdpwrap32.dll
+          find artifacts/rdpwrap-dll-x64 -name 'RDPWrap.dll' | head -1 | xargs -I{} cp {} release/rdpwrap64.dll
+
+          # EXE tools
+          cp artifacts/rdpwinst-exe/RDPWInst.exe release/
+          cp artifacts/rdpconf-exe/RDPConf.exe release/
+          cp artifacts/rdpcheck-exe/RDPCheck.exe release/
+
+          # Config and batch files
+          cp res/rdpwrap.ini release/
+          cp bin/install.bat release/
+          cp bin/uninstall.bat release/
+          cp bin/update.bat release/
+          cp LICENSE release/
+
+          # Create zip
+          cd release && zip -r ../RDPWrap-community.zip .
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RDPWrap-community-package
+          path: RDPWrap-community.zip
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: RDPWrap-community.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false

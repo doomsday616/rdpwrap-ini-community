@@ -1,0 +1,263 @@
+object MainForm: TMainForm
+  Left = 300
+  Height = 314
+  Top = 200
+  Width = 404
+  BorderStyle = bsDialog
+  Caption = 'RDP Wrapper Configuration'
+  ClientHeight = 314
+  ClientWidth = 404
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  Position = poDesktopCenter
+  LCLVersion = '4.0.0.0'
+  object gbDiag: TGroupBox
+    Left = 8
+    Height = 77
+    Top = 6
+    Width = 388
+    Caption = 'Diagnostics'
+    ClientHeight = 57
+    ClientWidth = 384
+    TabOrder = 0
+    object lWrapper: TLabel
+      Left = 11
+      Height = 13
+      Top = 1
+      Width = 74
+      Caption = 'Wrapper state:'
+    end
+    object lsWrapper: TLabel
+      Left = 91
+      Height = 13
+      Top = 1
+      Width = 44
+      Caption = 'Unknown'
+    end
+    object lWrapVer: TLabel
+      Left = 202
+      Height = 13
+      Top = 1
+      Width = 20
+      Caption = 'ver.'
+    end
+    object lsWrapVer: TLabel
+      Left = 226
+      Height = 13
+      Top = 1
+      Width = 44
+      Caption = 'Unknown'
+    end
+    object lService: TLabel
+      Left = 11
+      Height = 13
+      Top = 20
+      Width = 67
+      Caption = 'Service state:'
+    end
+    object lsService: TLabel
+      Left = 91
+      Height = 13
+      Top = 20
+      Width = 44
+      Caption = 'Unknown'
+    end
+    object lTSVer: TLabel
+      Left = 202
+      Height = 13
+      Top = 20
+      Width = 20
+      Caption = 'ver.'
+    end
+    object lsTSVer: TLabel
+      Left = 226
+      Height = 13
+      Top = 20
+      Width = 44
+      Caption = 'Unknown'
+    end
+    object lListener: TLabel
+      Left = 11
+      Height = 13
+      Top = 39
+      Width = 70
+      Caption = 'Listener state:'
+    end
+    object lsListener: TLabel
+      Left = 91
+      Height = 13
+      Top = 39
+      Width = 44
+      Caption = 'Unknown'
+    end
+    object lsSuppVer: TLabel
+      Left = 202
+      Height = 13
+      Top = 39
+      Width = 70
+      Caption = '[support level]'
+    end
+  end
+  object gbGeneral: TGroupBox
+    Left = 8
+    Height = 184
+    Top = 89
+    Width = 188
+    Caption = 'General Settings'
+    ClientHeight = 164
+    ClientWidth = 184
+    TabOrder = 1
+    object cbAllowTSConnections: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 2
+      Width = 132
+      Caption = 'Enable Remote Desktop'
+      TabOrder = 0
+      OnClick = cbAllowTSConnectionsClick
+    end
+    object lRDPPort: TLabel
+      Left = 8
+      Height = 13
+      Top = 28
+      Width = 47
+      Caption = 'RDP port:'
+    end
+    object seRDPPort: TSpinEdit
+      Left = 61
+      Height = 23
+      Top = 25
+      Width = 62
+      MaxValue = 65535
+      MinValue = 0
+      TabOrder = 1
+      Value = 0
+      OnChange = seRDPPortChange
+    end
+    object cbSingleSessionPerUser: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 53
+      Width = 129
+      Caption = 'Single session per user'
+      TabOrder = 2
+      OnClick = cbAllowTSConnectionsClick
+    end
+    object cbHideUsers: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 76
+      Width = 149
+      Caption = 'Hide users on logon screen'
+      TabOrder = 3
+      OnClick = cbAllowTSConnectionsClick
+    end
+    object cbCustomPrg: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 99
+      Width = 169
+      Caption = 'Allow to start custom programs'
+      TabOrder = 4
+      OnClick = cbAllowTSConnectionsClick
+    end
+  end
+  object rgNLA: TRadioGroup
+    Left = 202
+    Height = 73
+    Top = 89
+    Width = 194
+    AutoFill = True
+    Caption = 'Authentication Mode'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToLeftAndTopToTop
+    ClientHeight = 53
+    ClientWidth = 190
+    Items.Strings = (
+      'GUI Authentication Only'
+      'Default RDP Authentication'
+      'Network Level Authentication'
+    )
+    TabOrder = 2
+    OnClick = cbAllowTSConnectionsClick
+  end
+  object rgShadow: TRadioGroup
+    Left = 202
+    Height = 105
+    Top = 168
+    Width = 194
+    AutoFill = True
+    Caption = 'Session Shadowing Mode'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToLeftAndTopToTop
+    ClientHeight = 85
+    ClientWidth = 190
+    Items.Strings = (
+      'Disable Shadowing'
+      'Full access with user'#39's permission'
+      'Full access without permission'
+      'View only with user'#39's permission'
+      'View only without permission'
+    )
+    TabOrder = 3
+    OnClick = cbAllowTSConnectionsClick
+  end
+  object bOK: TButton
+    Left = 40
+    Height = 25
+    Top = 281
+    Width = 75
+    Caption = 'OK'
+    ModalResult = 1
+    TabOrder = 4
+    OnClick = bOKClick
+  end
+  object bCancel: TButton
+    Left = 121
+    Height = 25
+    Top = 281
+    Width = 75
+    Caption = 'Cancel'
+    ModalResult = 2
+    TabOrder = 5
+    OnClick = bCancelClick
+  end
+  object bApply: TButton
+    Left = 202
+    Height = 25
+    Top = 281
+    Width = 75
+    Caption = 'Apply'
+    Enabled = False
+    TabOrder = 6
+    OnClick = bApplyClick
+  end
+  object bLicense: TButton
+    Left = 283
+    Height = 25
+    Top = 281
+    Width = 87
+    Caption = 'View license...'
+    TabOrder = 7
+    OnClick = bLicenseClick
+  end
+  object Timer: TTimer
+    Interval = 250
+    OnTimer = TimerTimer
+    Left = 352
+    Top = 27
+  end
+end

@@ -1,0 +1,12 @@
+# INI file — primary reviewers
+res/rdpwrap.ini @sjackson0109 @doomsday616
+
+# Build system
+.github/ @doomsday616
+src-x86-x64-Fusix/ @doomsday616
+src-installer/ @doomsday616
+src-rdpconfig/ @doomsday616
+
+# Documentation
+*.md @doomsday616
+docs/ @sjackson0109 @doomsday616
