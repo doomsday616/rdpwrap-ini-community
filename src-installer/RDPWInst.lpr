@@ -614,7 +614,7 @@ begin
     Writeln('[-] OpenProcessToken error (code ', ErrorCode, ').');
     Exit;
   end;
-  if not LookupPrivilegeValue(nil, PWideChar(WideString(SePriv)), SeNameValue) then
+  if not LookupPrivilegeValue(nil, PChar(SePriv), SeNameValue) then
   begin
     ErrorCode := GetLastError;
     Writeln('[-] LookupPrivilegeValue error (code ', ErrorCode, ').');
