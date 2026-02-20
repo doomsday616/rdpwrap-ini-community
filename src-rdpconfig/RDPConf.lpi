@@ -27,7 +27,7 @@
           </SearchPaths>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
-            <TargetOS Value="win32"/>
+            <TargetOS Value="win64"/>
             <Optimizations>
               <OptimizationLevel Value="3"/>
             </Optimizations>
@@ -71,7 +71,7 @@
               <OverflowChecks Value="True"/>
               <StackChecks Value="True"/>
             </Checks>
-            <TargetOS Value="win32"/>
+            <TargetOS Value="win64"/>
           </CodeGeneration>
           <Linking>
             <Debugging>
@@ -135,7 +135,7 @@
     </SearchPaths>
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
-      <TargetOS Value="win32"/>
+      <TargetOS Value="win64"/>
       <Optimizations>
         <OptimizationLevel Value="3"/>
       </Optimizations>
